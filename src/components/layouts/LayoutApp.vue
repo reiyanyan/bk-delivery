@@ -4,9 +4,10 @@
   >
     <div class="relative flex flex-row gap-[4rem] items-center h-full py-3">
       <img
-        class="absolute rounded-full h-[90px] w-[90px] inset-y-4"
+        class="absolute rounded-full h-[90px] w-[90px] inset-y-4 cursor-pointer"
         src="https://via.placeholder.com/100"
         alt=""
+        @click="$router.push('/')"
       />
       <router-link class="ml-[130px]" to="/">
         <div class="flex flex-col">

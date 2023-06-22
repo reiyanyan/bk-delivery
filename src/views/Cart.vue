@@ -72,7 +72,7 @@
           <div class="flex flex-col gap-8">
             <div class="flex flex-col gap-4">
               <p>Order Subtotal</p>
-              <p>Rp. 35,455</p>
+              <p>{{ rupiahFormatter(totalPrice) }}</p>
               <p>*Price might change due to your delivery location</p>
             </div>
             <div class="flex flex-col gap-4">
@@ -111,6 +111,13 @@ export default defineComponent({
       cart.deleteItems(item);
     };
 
+    const totalPrice = computed(() =>
+      cartList.value.reduce(
+        (currentTotal, item) => currentTotal + item.price,
+        0
+      )
+    );
+
     onMounted(() => {
       cart.loadCarts();
     });
@@ -120,6 +127,7 @@ export default defineComponent({
       notes,
       rupiahFormatter,
       deleteItems,
+      totalPrice,
     };
   },
 });
