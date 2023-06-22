@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-bk py-14">
+  <div class="min-h-screen bg-bk py-14">
     <div class="container grid grid-cols-8 gap-8">
       <div class="col-span-2">
         <SideMenu></SideMenu>
@@ -62,10 +62,17 @@ export default defineComponent({
       slug: "",
     });
 
-    const findObject = (val: string, name: string) => {
-      return catalogue.catalogue[val].find((item) => {
+    const findObject = (category: string, name: string) => {
+      const avail = catalogue.catalogue[category].find((item) => {
         return item.name === turnSlugToString(name);
       });
+
+      if (!avail) return undefined;
+
+      const isCartExist = cart.isItemExist({ slug: avail.slug });
+      if (isCartExist) productCount.value = isCartExist.value.count;
+
+      return avail;
     };
 
     const checkProductAvailable = async (name: string) => {
@@ -84,12 +91,13 @@ export default defineComponent({
     };
 
     const addToCart = () => {
-      const { id, name, img, price } = product.value;
+      const { id, name, img, price, slug } = product.value;
       const item: CartType = {
         id,
         name,
         img,
         price,
+        slug,
         count: productCount.value,
       };
       cart.addToCarts(item);

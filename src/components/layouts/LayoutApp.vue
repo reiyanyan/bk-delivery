@@ -25,8 +25,10 @@
     <div class="flex flex-row gap-4 items-center">
       <p class="text-2xl font-semibold">Login</p>
       <div
-        class="flex bg-bk-primary h-full px-3 items-center cursor-pointer"
+        class="relative flex bg-bk-primary h-full px-3 items-center cursor-pointer"
         @click="$router.push('/cart/preview')"
+        @mouseover="hoverCart = true"
+        @mouseleave="hoverCart = false"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -47,6 +49,44 @@
           class="inline-flex items-center justify-center w-6 h-6 text-xs font-bold text-white bg-red-500 rounded-full -mt-7 -ml-4"
         >
           {{ cartItemsLength }}
+        </div>
+        <div
+          v-if="hoverCart"
+          class="absolute bg-white top-20 -right-10 tiles min-w-[400px] w-full shadow-2xl rounded-lg p-4 text-black z-[3000]"
+        >
+          <div v-if="cartList.length > 0" class="flex flex-col gap-4">
+            <table class="w-full text-xs">
+              <tbody>
+                <tr
+                  v-for="(item, index) in cartList"
+                  :key="index"
+                  class="border-b"
+                >
+                  <td class="flex flex-row gap-4 py-2 items-center">
+                    <img class="h-[50px] w-[60px]" :src="item.img" />
+                    <p>{{ item.name }}</p>
+                  </td>
+                  <td class="py-2 tracking-widest w-[20%]">
+                    x{{ item.count }}
+                  </td>
+                  <td class="py-2">
+                    {{ rupiahFormatter(item.price) }}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <div class="flex flex-row justify-between items-center">
+              <p class="font-medium uppercase">Subtotal</p>
+              <p class="text-xl">{{ rupiahFormatter(subTotal) }}</p>
+            </div>
+            <BkButton @click="$router.push('/cart/preview')">
+              Go To Cart
+            </BkButton>
+          </div>
+          <div v-else class="flex flex-col gap-4">
+            <p class="text-sm font-semibold">Your cart is empty.</p>
+            <BkButton @click="$router.push('/menus')"> Order Now </BkButton>
+          </div>
         </div>
       </div>
     </div>
@@ -152,13 +192,22 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, computed } from "vue";
+import { defineComponent, onMounted, computed, ref } from "vue";
 import { useCartStore } from "@/store";
+import { rupiahFormatter } from "@/helpers";
+import BkButton from "@/components/button/BkButton.vue";
 
 export default defineComponent({
+  components: {
+    BkButton,
+  },
   setup() {
     const cart = useCartStore();
+
     const cartItemsLength = computed(() => cart.carts.length);
+    const subTotal = computed(() => cart.totalPriceCart);
+    const hoverCart = ref(false);
+    const cartList = computed(() => cart.carts);
 
     onMounted(() => {
       cart.loadCarts();
@@ -166,7 +215,26 @@ export default defineComponent({
 
     return {
       cartItemsLength,
+      hoverCart,
+      cartList,
+      rupiahFormatter,
+      subTotal,
     };
   },
 });
 </script>
+
+<style scoped>
+.tiles:before {
+  content: "";
+  width: 32px;
+  height: 32px;
+  position: absolute;
+  right: 3.4rem;
+  top: -16px;
+  transform: rotate(45deg);
+  background: white;
+  border-radius: 2px 0px;
+  z-index: 1000;
+}
+</style>

@@ -28,10 +28,27 @@ const routes: Array<RouteRecordRaw> = [
     meta: { layout: LayoutApp },
   },
   {
-    path: "/cart/preview",
-    name: "CartPreview",
-    component: () => import("@/views/Cart.vue"),
+    path: "/cart",
+    name: "CartIndex",
+    component: () => import("@/views/cart/Index.vue"),
     meta: { layout: LayoutApp },
+    children: [
+      {
+        path: "preview",
+        name: "CartPreview",
+        component: () => import("@/views/cart/Cart.vue"),
+      },
+      {
+        path: "delivery",
+        name: "CartDelivery",
+        component: () => import("@/views/cart/Delivery.vue"),
+      },
+      {
+        path: "payment",
+        name: "CartPayment",
+        component: () => import("@/views/cart/Payment.vue"),
+      },
+    ],
   },
   {
     path: "/:pathMatch(.*)*",

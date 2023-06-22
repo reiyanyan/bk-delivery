@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-bk py-14">
+  <div class="min-h-screen bg-bk py-14">
     <div class="container grid grid-cols-8 gap-8">
       <div class="col-span-2">
         <SideMenu v-model="currentSlug"></SideMenu>

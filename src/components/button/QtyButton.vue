@@ -13,7 +13,11 @@
     >
       <path stroke-linecap="round" stroke-linejoin="round" d="M18 12H6" />
     </svg>
-    <input v-model="modelValue" class="text-center w-[50px]" type="text" />
+    <input
+      v-model="modelValue"
+      class="text-center w-[50px] select-none"
+      type="text"
+    />
     <svg
       xmlns="http://www.w3.org/2000/svg"
       fill="none"

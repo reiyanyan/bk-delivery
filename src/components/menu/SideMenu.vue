@@ -1,8 +1,6 @@
 <template>
   <div class="flex flex-col gap-8">
-    <div class="bg-green-400">
-      <p>search</p>
-    </div>
+    <BkInputSearch v-model="search" />
     <div class="flex flex-col gap-4">
       <div
         v-for="(item, index) in categoryList"
@@ -22,12 +20,16 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, computed } from "vue";
+import { defineComponent, computed, ref } from "vue";
 import { useCatalogueStore } from "@/store";
 import { useRouter } from "vue-router";
 import { getSlugFromString } from "@/helpers";
+import BkInputSearch from "@/components/input/BkInputSearch.vue";
 
 export default defineComponent({
+  components: {
+    BkInputSearch,
+  },
   props: {
     modelValue: {
       type: String,
@@ -39,6 +41,7 @@ export default defineComponent({
     const router = useRouter();
     const catalogue = useCatalogueStore();
 
+    const search = ref("");
     const categoryList = computed(() => catalogue.categoryList);
 
     const redirect = (val: string) => {
@@ -52,6 +55,7 @@ export default defineComponent({
       categoryList,
       getSlugFromString,
       redirect,
+      search,
     };
   },
 });

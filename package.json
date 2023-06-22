@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@googlemaps/js-api-loader": "^1.16.2",
     "axios": "^1.4.0",
     "pinia": "^2.1.4",
     "vue": "^3.2.47",
@@ -16,6 +17,7 @@
     "vue3-carousel": "^0.3.1"
   },
   "devDependencies": {
+    "@types/google.maps": "^3.53.4",
     "@types/node": "^20.3.1",
     "@vitejs/plugin-vue": "^4.1.0",
     "autoprefixer": "^10.4.14",

@@ -1,31 +1,48 @@
 <template>
   <div class="step_sections">
-    <a href="/cart/preview" class="step active">
+    <p class="step" :class="{ active: isStepActive('CART') }">
       <span
         class="inline-flex items-center justify-center w-6 h-6 text-xs font-bold text-white bg-red-500 rounded-full -mt-7 -ml-4"
       >
         1
       </span>
       <strong class="text">Cart</strong>
-    </a>
-    <a href="#" class="step">
+    </p>
+    <p class="step" :class="{ active: isStepActive('DELIVERY') }">
       <span
         class="inline-flex items-center justify-center w-6 h-6 text-xs font-bold text-white bg-red-500 rounded-full -mt-7 -ml-4"
       >
         2
       </span>
       <strong class="text"> Delivery Info </strong>
-    </a>
-    <a href="#" class="step">
+    </p>
+    <p class="step" :class="{ active: isStepActive('PAYMENT') }">
       <span
         class="inline-flex items-center justify-center w-6 h-6 text-xs font-bold text-white bg-red-500 rounded-full -mt-7 -ml-4"
       >
         3
       </span>
       <strong class="text">Payment</strong>
-    </a>
+    </p>
   </div>
 </template>
+
+<script lang="ts">
+import { defineComponent } from "vue";
+import { useCartStore, type StepType } from "@/store";
+
+export default defineComponent({
+  setup() {
+    const cart = useCartStore();
+
+    const isStepActive = (step: StepType) => cart.isStepActive(step);
+
+    return {
+      isStepActive,
+    };
+  },
+});
+</script>
 
 <style scoped>
 .step_sections {
