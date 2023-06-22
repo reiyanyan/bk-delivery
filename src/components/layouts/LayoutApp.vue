@@ -26,7 +26,6 @@
       <p class="text-2xl font-semibold">Login</p>
       <div
         class="relative flex bg-bk-primary h-full px-3 items-center cursor-pointer"
-        @click="$router.push('/cart/preview')"
         @mouseover="hoverCart = true"
         @mouseleave="hoverCart = false"
       >
