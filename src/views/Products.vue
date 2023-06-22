@@ -1,66 +1,28 @@
 <template>
   <div class="bg-bk py-14">
     <div class="container grid grid-cols-8 gap-8">
-      <div class="col-span-2 flex flex-col gap-8">
-        <div class="bg-green-400">
-          <p>search</p>
-        </div>
-        <div class="flex flex-col gap-4">
-          <div
-            v-for="i in 8"
-            :key="i"
-            class="rounded-lg px-4 py-2"
-            :class="[i === 4 ? 'bg-[#faaf18]' : 'bg-[#fbe6d6]']"
-          >
-            <p class="text-xl font-bold">search</p>
-          </div>
-        </div>
+      <div class="col-span-2">
+        <SideMenu></SideMenu>
       </div>
       <div class="col-span-6">
-        <div class="grid grid-cols-5 p-4 rounded-md bg-white shadow-2xl">
-          <div class="col-span-3 flex flex-col gap-4">
-            <p>2 Pcs Chicken Strips</p>
-            <p>2 pcs chicken strips</p>
+        <div
+          class="grid grid-cols-5 p-4 rounded-md divide-x bg-white shadow-2xl"
+        >
+          <div class="col-span-3 flex flex-col pr-8 gap-4 items-center">
+            <p class="text-2xl font-bold">{{ product.name }}</p>
+            <p>{{ product.desc }}</p>
             <img
               class="aspect-square h-[200px] w-[200px]"
-              src="https://via.placeholder.com/250"
+              :src="product.img"
               alt=""
             />
           </div>
-          <div class="col-span-2 flex flex-col gap-4">
-            <p>2 Pcs Chicken Strips</p>
-            <div class="flex flex-row justify-around">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke-width="1.5"
-                stroke="currentColor"
-                class="w-6 h-6"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M18 12H6"
-                />
-              </svg>
-              <input class="text-center" v-model="productCount" type="text" />
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke-width="1.5"
-                stroke="currentColor"
-                class="w-6 h-6"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M12 6v12m6-6H6"
-                />
-              </svg>
-            </div>
-            <BkButton>Add to Cart</BkButton>
+          <div class="col-span-2 flex flex-col pl-8 gap-4">
+            <p class="text-2xl font-bold">
+              {{ rupiahFormatter(product.price) }}
+            </p>
+            <QtyButton v-model="productCount"></QtyButton>
+            <BkButton @click="addToCart">Add to Cart</BkButton>
           </div>
         </div>
       </div>
@@ -69,18 +31,81 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from "vue";
+import { defineComponent, ref, onMounted } from "vue";
 import BkButton from "@/components/button/BkButton.vue";
+import { useRoute, useRouter } from "vue-router";
+import SideMenu from "@/components/menu/SideMenu.vue";
+import { useCatalogueStore, useCartStore, type ProductItem } from "@/store";
+import { turnSlugToString, rupiahFormatter } from "@/helpers";
+import QtyButton from "@/components/button/QtyButton.vue";
+import { CartType } from "../store/cart";
 
 export default defineComponent({
   components: {
     BkButton,
+    SideMenu,
+    QtyButton,
   },
   setup() {
+    const route = useRoute();
+    const router = useRouter();
+    const catalogue = useCatalogueStore();
+    const cart = useCartStore();
+
     const productCount = ref(1);
+    const product = ref<ProductItem>({
+      id: "",
+      name: "",
+      desc: "",
+      img: "",
+      price: 0,
+      slug: "",
+    });
+
+    const findObject = (val: string, name: string) => {
+      return catalogue.catalogue[val].find((item) => {
+        return item.name === turnSlugToString(name);
+      });
+    };
+
+    const checkProductAvailable = async (name: string) => {
+      let exist = false;
+      await Promise.all(
+        catalogue.categoryList.map((val) => {
+          const avail = findObject(val, name);
+          if (avail) {
+            exist = true;
+            product.value = avail;
+          }
+        })
+      ).then(() => {
+        if (!exist) router.push("/404");
+      });
+    };
+
+    const addToCart = () => {
+      const { id, name, img, price } = product.value;
+      const item: CartType = {
+        id,
+        name,
+        img,
+        price,
+        count: productCount.value,
+      };
+      cart.addToCarts(item);
+    };
+
+    onMounted(async () => {
+      await catalogue.getCatalogue();
+      const { slug } = route.params;
+      checkProductAvailable(String(slug));
+    });
 
     return {
       productCount,
+      product,
+      rupiahFormatter,
+      addToCart,
     };
   },
 });

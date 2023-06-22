@@ -14,6 +14,11 @@ module.exports = {
       container: {
         center: true,
       },
+      colors: {
+        "bk-primary": "#ed7801",
+        "bk-secondary": "#fbe6d6",
+        "bk-dark": "#8b542f",
+      },
     },
   },
   variants: {

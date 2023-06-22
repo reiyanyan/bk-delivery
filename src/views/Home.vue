@@ -14,21 +14,22 @@
         <pagination />
       </template>
     </carousel>
-    <div class="container flex flex-col items-center mt-8 gap-4">
+    <div class="container flex flex-col items-center py-8 gap-4">
       <p class="text-2xl font-semibold">Our Menus</p>
-      <div class="grid grid-cols-3 gap-8">
+      <div class="grid grid-cols-3 gap-8 w-full">
         <div
-          v-for="i in 4"
-          :key="i"
-          class="flex flex-col gap-4 p-4 rounded-md bg-white shadow-2xl"
+          v-for="(item, index) in categoryList"
+          :key="index"
+          class="flex flex-col gap-4 p-4 rounded-md bg-white shadow-2xl cursor-pointer"
+          @click="redirect(item)"
         >
           <img
             class="aspect-square h-full"
-            src="https://via.placeholder.com/250"
+            src="https://via.placeholder.com/100"
             alt=""
           />
-          <div class="flex flex-row justify-between">
-            <p>Special Menu</p>
+          <div class="flex flex-row justify-between items-center">
+            <p class="font-bold text-xl text-bk-dark">{{ item }}</p>
             <BkButton>Order</BkButton>
           </div>
         </div>
@@ -38,9 +39,12 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent, onMounted, computed } from "vue";
 import { Carousel, Slide, Pagination, Navigation } from "vue3-carousel";
 import BkButton from "@/components/button/BkButton.vue";
+import { useCatalogueStore } from "@/store";
+import { useRouter } from "vue-router";
+import { getSlugFromString } from "@/helpers";
 
 export default defineComponent({
   components: {
@@ -49,6 +53,25 @@ export default defineComponent({
     Pagination,
     Navigation,
     BkButton,
+  },
+  setup() {
+    const catalogue = useCatalogueStore();
+    const router = useRouter();
+
+    const categoryList = computed(() => catalogue.categoryList);
+
+    const redirect = (val: string) => {
+      router.push(`/menus/${getSlugFromString(val)}`);
+    };
+
+    onMounted(async () => {
+      await catalogue.getCatalogue();
+    });
+
+    return {
+      categoryList,
+      redirect,
+    };
   },
 });
 </script>

@@ -1,37 +1,24 @@
 <template>
   <div class="bg-bk py-14">
     <div class="container grid grid-cols-8 gap-8">
-      <div class="col-span-2 flex flex-col gap-8">
-        <div class="bg-green-400">
-          <p>search</p>
-        </div>
-        <div class="flex flex-col gap-4">
-          <div
-            v-for="i in 8"
-            :key="i"
-            class="rounded-lg px-4 py-2"
-            :class="[i === 4 ? 'bg-[#faaf18]' : 'bg-[#fbe6d6]']"
-          >
-            <p class="text-xl font-bold">search</p>
-          </div>
-        </div>
+      <div class="col-span-2">
+        <SideMenu v-model="currentSlug"></SideMenu>
       </div>
       <div class="col-span-6">
         <div class="grid grid-cols-2 gap-8">
           <div
-            v-for="i in 4"
-            :key="i"
-            class="flex flex-col gap-4 p-4 rounded-md bg-white shadow-2xl"
+            v-for="(item, index) in productList"
+            :key="index"
+            class="flex flex-col gap-4 p-4 rounded-md bg-white shadow-2xl cursor-pointer"
+            @click="redirectProducts(item.slug)"
           >
-            <img
-              class="aspect-square h-full"
-              src="https://via.placeholder.com/250"
-              alt=""
-            />
+            <img class="aspect-square h-full" :src="item.img" alt="" />
             <div class="flex flex-row justify-between">
               <div class="flex flex-col">
-                <p>Nama Menu</p>
-                <p>Rp.123,900</p>
+                <p class="text-xl font-bold">{{ item.name }}</p>
+                <p class="text-lg font-bold">
+                  {{ rupiahFormatter(item.price) }}
+                </p>
               </div>
             </div>
           </div>
@@ -42,21 +29,68 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted } from "vue";
+import { defineComponent, onMounted, computed, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
+import { ProductItem, useCatalogueStore } from "@/store";
+import {
+  getSlugFromString,
+  turnSlugToString,
+  rupiahFormatter,
+} from "@/helpers";
+import SideMenu from "@/components/menu/SideMenu.vue";
 
 export default defineComponent({
+  components: {
+    SideMenu,
+  },
   setup() {
     const route = useRoute();
     const router = useRouter();
+    const catalogue = useCatalogueStore();
 
-    onMounted(() => {
+    const categoryList = computed(() => catalogue.categoryList);
+    const currentSlug = ref("");
+    const productList = ref<ProductItem[]>([]);
+
+    const getProductList = () => {
+      productList.value =
+        catalogue.catalogue[turnSlugToString(currentSlug.value)];
+    };
+
+    const redirectProducts = (val: string) => {
+      router.push("/products/" + getSlugFromString(val));
+    };
+
+    watch(
+      () => currentSlug.value,
+      () => getProductList()
+    );
+
+    onMounted(async () => {
+      await catalogue.getCatalogue();
+
       const { slug } = route.params;
+      if (
+        !slug ||
+        !categoryList.value.includes(turnSlugToString(String(slug)))
+      ) {
+        const mockedSlug = getSlugFromString(categoryList.value[0]);
+        router.replace("/menus/" + mockedSlug);
+        currentSlug.value = mockedSlug;
+      } else {
+        currentSlug.value = String(slug);
+      }
 
-      if (!slug) router.replace("/menu/halo");
+      getProductList();
     });
 
-    return {};
+    return {
+      getSlugFromString,
+      currentSlug,
+      productList,
+      rupiahFormatter,
+      redirectProducts,
+    };
   },
 });
 </script>

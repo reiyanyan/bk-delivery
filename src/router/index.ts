@@ -10,13 +10,13 @@ const routes: Array<RouteRecordRaw> = [
     meta: { layout: LayoutApp },
   },
   {
-    path: "/menu",
+    path: "/menus",
     name: "Menu",
     component: () => import("@/views/Menu.vue"),
     meta: { layout: LayoutApp },
   },
   {
-    path: "/menu/:slug",
+    path: "/menus/:slug",
     name: "MenuDynamic",
     component: () => import("@/views/Menu.vue"),
     meta: { layout: LayoutApp },
@@ -25,6 +25,18 @@ const routes: Array<RouteRecordRaw> = [
     path: "/products/:slug",
     name: "ProductsDetail",
     component: () => import("@/views/Products.vue"),
+    meta: { layout: LayoutApp },
+  },
+  {
+    path: "/cart/preview",
+    name: "CartPreview",
+    component: () => import("@/views/Cart.vue"),
+    meta: { layout: LayoutApp },
+  },
+  {
+    path: "/:pathMatch(.*)*",
+    name: "NotFound",
+    component: () => import("@/views/error/404.vue"),
     meta: { layout: LayoutApp },
   },
 ];
